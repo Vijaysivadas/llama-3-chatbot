@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New chat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="/static/style.css">
+
+</head>
+
+<body>
+    <section class="message-area">
+        <div id="myModal" class="modal fade" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Rename chat</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Enter the new name you ant for this chat and click submit</p>
+                        <p class="text-secondary"><small>Colse if you dont want to change the name</small></p>
+                        <form id="editNameForm" class="p-3">
+                            <div class="row">
+                                <div class="col-12 col-sm-9">
+                                    <div class="mb-3">
+                                        <input type="text" id="editnewName" class="form-control"
+                                            placeholder="Enter new name" id="exampleInputEmail1"
+                                            aria-describedby="emailHelp">
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-3">
+                                    <input type="submit" class="btn btn-primary" value="Submit">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <a class="p-5" data-bs-toggle="offcanvas" href="#offcanvasWithBothOptions" role="button"
+            aria-controls="offcanvasExample">
+            <img src="/static/img/list-symbol-of-three-items-with-dots.png" alt="" srcset="" width="30px">
+        </a>
+
+        <div class="offcanvas offcanvas-start " data-bs-scroll="true" data-bs-backdrop="static" tabindex="1"
+            id="offcanvasWithBothOptions" aria-labelledby="offcanvasWithBothOptionsLabel">
+            <div class="chat-list">
+                <div class="offcanvas-header row">
+                    <div class="col-6">
+                        <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel">Chats</h5>
+                    </div>
+                    <div class="col-6 text-center">
+                        <a href="/createchat" class="btn btn-primary ">New</a>
+                        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"
+                            aria-label="Close"></button>
+                    </div>
+                </div>
+
+                <div class="offcanvas-body">
+                    <div style="max-height: 900px; overflow-x: hidden; overflow-y: auto;" id="chatlist-container"
+                        class="chatlist-container">
+                        {% if chatlist|length > 0 %}
+                        {% for subject in chatlist[-1::-1] %}
+                        {% set chat_id = subject['id'] %}
+                        <div id="chatslink{{chat_id}}">
+                            <div class="row chats-link p-3">
+                                <div class="col-12">
+                                    <a href="/chat?chat_id={{ chat_id }}" id="{{ chat_id }}"
+                                        class="d-flex align-items-center p-3 chats-link">
+                                        <div class="flex-shrink-0">
+                                            <img class="img-fluid" src="/static/img/chat (1).png" width="30px"
+                                                alt="user img">
+                                            <span class="" id="activechat"></span>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h3 id="name{{ chat_id }}">{{ subject['name'] if subject['name'] != None
+                                                else 'New chat' }}</h3>
+                                        </div>
+                                    </a>
+                                    <div class="flex text-center ">
+                                        <a href="" id="edit#{{ chat_id }}#notinPage" onclick="editName(this.id, event)"
+                                            class="editChat btn btn-primary">Edit</a>
+                                        <a href="" id="delete#{{ chat_id }}#notinPage"
+                                            onclick="deleteChat(this.id, event)"
+                                            class="deleteChat btn btn-primary">Delete</a>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container h-100" style=" position: relative;">
+            <div class="chatbox" id="chatbox">
+                <div class="msg-head">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0">
+                                    <img class="img-fluid" width="35x" src="/static/img/woman.png"
+                                        alt="user img">
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h3 id="chatTitle">New chat</h3>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+                <div class="msg-body" style="overflow-x:hidden; overflow-y: auto;">
+                    <ul id="chat-messages">
+
+                        Chats Here
+
+
+
+                    </ul>
+                </div>
+
+
+
+
+            </div>
+            <div class="send-box p-5">
+
+                <form method="post" id="chatForm" class="row">
+                    <div class="col-9"><input type="text" class="form-control " name="message"
+                            style="border-radius: 100px; height: 40px;" id='text_input' aria-label="message…"
+                            placeholder="Write message…">
+                        <input hidden name="newchat" value="newchat" />
+                    </div>
+
+                    <div class="col-3  "><input type="submit" name="submit" class="inputbtn" value="submit">
+                    </div>
+                </form>
+
+                <div class="send-btns">
+                    <div class="attach">
+                        <button type="button" id="speakbtn" onclick="changeState()" class="form-control"
+                            data-toggle="button" aria-pressed="false" autocomplete="off">
+                            Speak
+                        </button>
+
+
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+    <div id="output"></div>
+    <audio src="" id="tts-audio" hidden></audio>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <script>
+
+        function editName(idData, event) {
+            event.preventDefault();
+            var myModal = new bootstrap.Modal(document.getElementById('myModal'), {
+                keyboard: false
+            })
+            myModal.show()
+
+            editForm = document.getElementById('editNameForm')
+            idData = idData.split("#")
+            chat_id = idData[1]
+            if (idData[2] === 'inPage') {
+                context = 'inPage'
+            }
+            else if (idData[2] === 'notinPage') {
+                context = 'notinPage'
+            }
+            editForm.addEventListener('submit', function (event) {
+                event.preventDefault()
+                newName = document.getElementById('editnewName').value
+                fetch('http://127.0.0.1:5000/edit', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ chat_id: chat_id, context: context, name: newName })
+
+                }).then(response => response.json())
+                    .then(data => {
+
+                        document.getElementById('name' + chat_id).innerHTML = data.chatName
+                        document.getElementById('chatTitle').innerHTML = data.chatName
+
+
+                        myModal.hide()
+                        var myModalEl = document.getElementById('myModal')
+                        myModalEl.addEventListener('hidden.bs.modal', function (event) {
+                            editForm.reset()
+                        })
+
+                    })
+
+            });
+
+        }
+        function deleteChat(idData, event) {
+
+            event.preventDefault();
+            idData = idData.split("#")
+
+            chat_id = idData[1]
+
+            if (document.querySelector('[id^="new#"]')) {
+                thischat_id = document.querySelector('[id^="new#"]').id.split('#')
+
+                if (chat_id == thischat_id[1]) {
+                    context = 'inPage'
+                }
+                else {
+                    context = 'notinPage'
+                }
+            }
+            context = 'notinPage'
+            fetch('http://127.0.0.1:5000/delete', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ chat_id: chat_id, context: context })
+
+            })
+                .then(response => {
+
+                    if (response.redirected) {
+
+                        window.location.href = response.url;
+                    }
+                    alert('The chat has been deleted !')
+                    chat = document.getElementById('chatslink' + chat_id)
+                    chat.innerHTML = ''
+                    chat.parentNode.removeChild(chat)
+                })
+
+        }
+
+
+
+
+        function changeState() {
+            el = document.getElementById('speakbtn')
+            if (el.ariaPressed === "false") {
+                el.ariaPressed = true
+                el.classList.add('pressed')
+            } else if (el.ariaPressed === "true") {
+                el.ariaPressed = false
+                el.classList.remove('pressed')
+            }
+        }
+        function speak(text) {
+            speakbtn = document.getElementById('speakbtn')
+            const ariaPressed = speakbtn.ariaPressed;
+            if (ariaPressed === "true") {
+                fetch("http://127.0.0.1:5000/speak", {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text: text })
+
+                }).then(response => response.json())
+                    .then(data => {
+
+                        ttsaudio = document.getElementById('tts-audio')
+                        ttsaudio.src = data.audio + "?time=" + new Date().getTime();
+
+                        ttsaudio.load()
+                        ttsaudio.play()
+                    })
+
+            }
+
+        }
+        function appendUserMessage(usrinput) {
+            const replyItem = document.createElement('li');
+            replyItem.className = 'repaly';
+
+            const replyParagraph = document.createElement('p');
+            replyParagraph.textContent = usrinput;
+
+            replyItem.appendChild(replyParagraph);
+            document.querySelector('#chat-messages').appendChild(replyItem);
+        }
+        function appendAIMessage(message) {
+            const senderItem = document.createElement('li');
+            senderItem.className = 'sender';
+
+            const senderParagraph = document.createElement('p');
+            senderParagraph.textContent = message;
+
+            senderItem.appendChild(senderParagraph);
+
+            document.querySelector('#chat-messages').appendChild(senderItem);
+
+        }
+        function appendChat(chat_id, subject_name) {
+            let mainDiv = document.createElement('div');
+            mainDiv.id = `chatslink${chat_id}`;
+
+            let rowDiv = document.createElement('div');
+            rowDiv.className = 'row chats-link p-3';
+            mainDiv.appendChild(rowDiv);
+
+            let colDiv = document.createElement('div');
+            colDiv.className = 'col-12';
+            rowDiv.appendChild(colDiv);
+
+            let anchor = document.createElement('a');
+            anchor.href = `/chat?chat_id=${chat_id}`;
+            anchor.id = chat_id;
+
+            anchor.className = 'd-flex align-items-center p-3 chats-link activeChat';
+            colDiv.appendChild(anchor);
+
+            let flexShrinkDiv = document.createElement('div');
+            flexShrinkDiv.className = 'flex-shrink-0';
+            anchor.appendChild(flexShrinkDiv);
+
+            let img = document.createElement('img');
+            img.className = 'img-fluid';
+            img.src = '/static/img/chat (1).png';
+            img.width = 30;
+            img.alt = 'user img';
+            flexShrinkDiv.appendChild(img);
+
+            let span = document.createElement('span');
+            span.id = 'activechat';
+            flexShrinkDiv.appendChild(span);
+
+            let flexGrowDiv = document.createElement('div');
+            flexGrowDiv.className = 'flex-grow-1 ms-3';
+            anchor.appendChild(flexGrowDiv);
+
+            let h3 = document.createElement('h3');
+            h3.id = `name${chat_id}`;
+            h3.textContent = subject_name ? subject_name : 'New chat';
+            flexGrowDiv.appendChild(h3);
+
+            let flexTextCenterDiv = document.createElement('div');
+            flexTextCenterDiv.className = 'flex text-center';
+            colDiv.appendChild(flexTextCenterDiv);
+
+            let editAnchor = document.createElement('a');
+            editAnchor.href = '';
+            editAnchor.id = `edit#${chat_id}#notinPage`;
+            editAnchor.onclick = function (event) { editName(editAnchor.id, event); };
+            editAnchor.className = 'editChat btn btn-primary';
+            editAnchor.textContent = 'Edit';
+            flexTextCenterDiv.appendChild(editAnchor);
+
+            let deleteAnchor = document.createElement('a');
+            deleteAnchor.href = '';
+            deleteAnchor.id = `new#${chat_id}`;
+            deleteAnchor.onclick = function (event) { deleteChat(deleteAnchor.id, event); };
+            deleteAnchor.className = 'deleteChat btn btn-primary';
+            deleteAnchor.textContent = 'Delete';
+            flexTextCenterDiv.appendChild(deleteAnchor);
+
+
+            chat = document.getElementById('chatlist-container')
+            chat.insertBefore(mainDiv, chat.firstChild)
+        }
+        function aityping() {
+            const chatBubble = document.createElement('div');
+            chatBubble.className = 'chat-bubble';
+            chatBubble.classList.add('my-message');
+            chatBubble.classList.add('message');
+            chatBubble.classList.add('float-left');
+            chatBubble.id = "chat-bubble"
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'typing';
+
+            for (let i = 0; i < 3; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                typingIndicator.appendChild(dot);
+            }
+
+            chatBubble.appendChild(typingIndicator);
+
+            document.getElementById('chat-messages').appendChild(chatBubble);
+        }
+
+        var form = document.getElementById("chatForm");
+        function handleForm(event) {
+            event.preventDefault();
+            usrinput = document.getElementById('text_input').value
+
+            appendUserMessage(usrinput)
+            aityping()
+
+
+            fetch('http://127.0.0.1:5000/newchat', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: usrinput })
+
+            }).then(response => response.json())
+                .then(data => {
+
+                    document.getElementById('chat-bubble').remove()
+                    appendAIMessage(data.message)
+
+
+                    if (data.newchat) {
+
+                        appendChat(data.chat_id, data.name)
+                    }
+
+                    speak(data.message)
+
+
+                });
+
+        }
+        form.addEventListener('submit', handleForm);
+    </script>
+</body>
+
+</html>
