@@ -24,7 +24,7 @@ async def loadLlama():
         bnb_8bit_use_double_quant=True,
         bnb_8bit_compute_dtype=torch.bfloat16
     )
-    hf_auth = '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'
+    hf_auth = 'your hf token here'
     model_config = tf.AutoConfig.from_pretrained(
         model_id,
         token=hf_auth
