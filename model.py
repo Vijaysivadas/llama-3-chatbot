@@ -15,7 +15,7 @@ async def loadLlama():
     
     global model,tokenizer,modelLoding
     modelLoding = True
-    model_id = '../models/llama-3-8b-instruct'
+    model_id = '/models/llama-3-8b-instruct'
     # device = f'cuda:{torch.cuda.current_device()}' if torch.cuda.is_available() else 'cpu'
     device='cuda:0'
     bnb_config = tf.BitsAndBytesConfig(
@@ -54,7 +54,7 @@ async def loadLlama():
 def loadWhisper():
     
 
-    model_id = "../models/whisper-2b"
+    model_id = "/models/whisper-2b"
 
     model = tf.AutoModelForSpeechSeq2Seq.from_pretrained(
         model_id, torch_dtype=torch_dtype, low_cpu_mem_usage=True, use_safetensors=True
